@@ -37,7 +37,7 @@ router.post('/admin-login',
             { expiresIn: '2h' }
         );
         res.cookie('token', token); 
-        res.render('dashboard-admin');
+        res.redirect('/dashboard-admin');
     }
 );
 

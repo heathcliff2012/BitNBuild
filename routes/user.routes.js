@@ -41,7 +41,7 @@ router.post('/public-login',
             { expiresIn: '2h' }
         );
         res.cookie('token', token); 
-        res.json({ message: 'Login successful', token });
+        res.redirect('/dashboard-public');
     }
 );
 
@@ -61,7 +61,7 @@ router.post('/signup',
         const { username, email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await userModel.create({ username, email, password: hashedPassword });
-        res.json({ message: 'User registered successfully', userId: newUser._id });
+        res.redirect('/public-login');
 
     }
 );
