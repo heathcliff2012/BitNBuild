@@ -63,7 +63,7 @@ router.get('/subsidies', (req, res) => {
   res.render('subsidies');
 });
 
-router.get('../ledgers/infrastructure', (req, res) => {
+router.get('/infrastructure', (req, res) => {
   res.render('infrastructure');
 });
 
