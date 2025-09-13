@@ -1,24 +1,33 @@
 {
-  "name": "bitnbuild",
+  "name": "c",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/heathcliff2012/BitNBuild.git"
+    "url": "git+https://github.com/heathcliff2012/Bit-n-Build.git"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/heathcliff2012/BitNBuild/issues"
+    "url": "https://github.com/heathcliff2012/Bit-n-Build/issues"
   },
-  "homepage": "https://github.com/heathcliff2012/BitNBuild#readme",
+  "homepage": "https://github.com/heathcliff2012/Bit-n-Build#readme",
+  "keywords": [],
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.2",
     "ejs": "^3.1.10",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "google-auth-library": "^10.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.18.1",
+    "morgan": "^1.10.1",
+    "nodemon": "^3.1.10"
   }
 }
