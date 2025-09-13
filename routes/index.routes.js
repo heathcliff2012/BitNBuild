@@ -1,35 +1,35 @@
 const express = require('express');
-
+const { validationResult } = require('express-validator');
+const ledgerModel = require('../models/ledger.model');
 const { body } = require('express-validator');
 const router = express.Router();
-const multer = require('multer');
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, 'uploads/');
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, Date.now() + '-' + file.originalname);
-//   },
-// });
-const fileModel = require('../models/file.model');
-const upload = multer({ dest: 'uploads/' });
 
 router.get('/dashboard-admin', (req, res) => {
   res.render('dashboard-admin');
 });
 
-router.post('/upload-file', upload.single('file'), (req, res) => {
-  console.log(req.body);
-  console.log("File",req.file);
-  
-    // const { filename, mimetype, size, path } = req.file;
-    // const newFile = new fileModel({ filename, mimetype, size, path });
-    // newFile.save();
-    // alert('File uploaded successfully');
-    res.redirect('/transport');
-    
-  });
+router.get('/transport', (req, res) => {
+  res.render('transport');
+});
 
+router.post('/transport', 
+  body('title').notEmpty().withMessage('Title is required'),
+  body('allocation').isNumeric().withMessage('Allocation must be a number'),
+  body('description').notEmpty().withMessage('Description must be at least 10 characters long'),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array()
+      });
+    }
+    const { title, description, allocation } = req.body;
+    
+    const newLedger = await ledgerModel.create({title, description, allocation});
+    console.log(newLedger);
+
+    res.render('/dashboard-admin', { title: req.body.title, description: req.body.description, allocation: req.body.allocation });
+  }
+);
 router.get('/dashboard-public', (req, res) => {
   const username = req.cookies.username
   res.render('dashboard-public', { username: username });
@@ -41,10 +41,6 @@ router.get('/public-ledger', (req, res) => {
 
 router.get('/feedback', (req, res) => {
   res.render('feedback');
-});
-
-router.get('/transport', (req, res) => {
-  res.render('transport');
 });
 
 router.get('/college-funds', (req, res) => {
