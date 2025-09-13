@@ -75,7 +75,7 @@
                                 <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary z-10"></i>
                                 <input type="text" id="search-input" placeholder="Search sectors..." class="w-full bg-foreground/50 border-2 border-transparent rounded-lg py-3 pl-10 pr-4 text-primary focus:border-accent focus:ring-0 transition">
                             </div>
-                            <a href="auraflow_dashboard.html" class="w-full sm:w-auto flex-shrink-0 bg-accent text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:scale-105 transition-transform flex items-center justify-center gap-2">
+                            <a href="dashboard-public" class="w-full sm:w-auto flex-shrink-0 bg-accent text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:scale-105 transition-transform flex items-center justify-center gap-2">
                                 <i data-lucide="home" class="w-4 h-4"></i>
                                 Back to Home
                             </a>

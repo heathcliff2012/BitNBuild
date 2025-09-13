@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" class="auraFlow">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraFlow: Edit Higher Education Grants Ledger</title>
+    <link rel="icon" href="https://placehold.co/32x32/22c55e/ffffff?text=A">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --background: radial-gradient(circle at 20% 30%, #2563eb, #22c55e);
+            --foreground: rgba(0,0,0,0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #d1fae5;
+            --accent: #06b6d4;
+            --highlight: #fcd34d;
+            --danger: #f87171;
+            font-family: 'Inter', sans-serif;
+        }
+        body { background: var(--background); color: var(--text-primary); }
+        .bg-foreground { background-color: var(--foreground); }
+        .text-primary { color: var(--text-primary); }
+        .text-secondary { color: var(--text-secondary); }
+        .text-accent { color: var(--accent); }
+        .bg-accent { background-color: var(--accent); }
+        .border-accent { border-color: var(--accent); }
+        .ring-accent { --tw-ring-color: var(--accent); }
+        .focus\:ring-accent:focus { --tw-ring-color: var(--accent); }
+        .focus\:border-accent:focus { border-color: var(--accent); }
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+    <div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-primary flex items-center gap-3">
+                    <i data-lucide="book-marked" class="w-8 h-8 text-accent"></i>
+                    Edit: Higher Education Grants Ledger
+                </h1>
+                <p class="text-sm text-secondary">Update allocation details and manage documents.</p>
+            </div>
+             <a href="admin_dashboard.html" class="bg-foreground/50 backdrop-blur-sm text-primary font-semibold py-2 px-4 rounded-lg shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                Back to Dashboard
+            </a>
+        </header>
+
+        <main class="bg-foreground p-6 sm:p-8 rounded-2xl space-y-8">
+            <!-- Section 1: Edit Ledger Details -->
+            <section>
+                <h2 class="text-xl font-bold text-primary flex items-center gap-2"><i data-lucide="sliders-horizontal" class="w-5 h-5 text-accent"></i>Ledger Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div>
+                        <label for="ledger-title" class="block text-sm font-medium text-secondary">Ledger Title</label>
+                        <input type="text" id="ledger-title" value="Higher Education Grants" class="mt-1 block w-full bg-transparent border-0 border-b-2 border-accent/50 focus:ring-0 focus:border-accent transition p-2">
+                    </div>
+                    <div>
+                        <label for="allocation-amount" class="block text-sm font-medium text-secondary">Allocation Amount (INR)</label>
+                        <input type="number" id="allocation-amount" value="60000000" class="mt-1 block w-full bg-transparent border-0 border-b-2 border-accent/50 focus:ring-0 focus:border-accent transition p-2">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="description" class="block text-sm font-medium text-secondary">Description</label>
+                        <textarea id="description" rows="3" class="mt-1 block w-full bg-transparent border-0 border-b-2 border-accent/50 focus:ring-0 focus:border-accent transition p-2">Scholarships and research grants for students in public universities.</textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Document Management -->
+            <section>
+                <h2 class="text-xl font-bold text-primary flex items-center gap-2"><i data-lucide="folder-open" class="w-5 h-5 text-accent"></i>Associated Documents</h2>
+                <ul class="mt-4 space-y-3">
+                    <li class="flex justify-between items-center p-3 bg-black/20 rounded-lg">
+                        <span class="flex items-center gap-2 text-sm"><i data-lucide="file-text" class="w-4 h-4 text-secondary"></i>Grant_Approval_Guidelines.pdf</span>
+                        <div class="flex gap-2">
+                            <button class="text-secondary hover:text-primary"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                            <button class="text-secondary hover:text-danger"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </li>
+                </ul>
+                <button onclick="document.getElementById('file-upload').click()" class="mt-4 w-full bg-accent/20 text-accent font-semibold py-3 px-4 rounded-lg border-2 border-dashed border-accent/50 hover:bg-accent/30 transition flex items-center justify-center gap-2">
+                    <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                    Upload New Document
+                </button>
+                <input type="file" id="file-upload" class="hidden"/>
+            </section>
+            
+            <!-- Action Buttons -->
+            <div class="flex justify-end pt-6 border-t border-white/10">
+                <button onclick="alert('Changes have been saved!')" class="bg-highlight text-black font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2">
+                    <i data-lucide="save" class="w-5 h-5"></i>
+                    Save All Changes
+                </button>
+            </div>
+        </main>
+    </div>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

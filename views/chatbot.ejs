@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Define theme variables */
+        :root {
+            --background: radial-gradient(circle at 20% 30%, #2563eb, #22c55e);
+            --foreground: rgba(0,0,0,0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #d1fae5;
+            --accent: #06b6d4;
+            --highlight: #fcd34d;
+            --danger: #f87171;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Apply theme variables */
+        body {
+            background-color: #0b1120;
+            background-image: var(--background);
+            color: var(--text-primary);
+        }
+        .bg-foreground { background-color: var(--foreground); }
+        .text-primary { color: var(--text-primary); }
+        .text-secondary { color: var(--text-secondary); }
+        .text-accent { color: var(--accent); }
+        .bg-accent { background-color: var(--accent); }
+        .border-accent { border-color: var(--accent); }
+        .ring-accent { --tw-ring-color: var(--accent); }
+        .text-danger { color: var(--danger); }
+        
+        @keyframes subtle-glow {
+            0%, 100% { box-shadow: 0 0 8px 2px rgba(6, 182, 212, 0.4); }
+            50% { box-shadow: 0 0 16px 6px rgba(6, 182, 212, 0.7); }
+        }
+        .animate-glow { animation: subtle-glow 3s ease-in-out infinite; }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: var(--accent); border-radius: 20px; }
+
+        /* Chatbot styles */
+        #chatbot-window {
+            transform-origin: bottom right;
+            transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s ease-out;
+            display: flex;
+        }
+        #chatbot-window.hidden {
+            transform: scale(0.5);
+            opacity: 0;
+            pointer-events: none;
+        }
+        #chat-messages::-webkit-scrollbar { width: 6px; }
+        #chat-messages::-webkit-scrollbar-thumb { background-color: var(--accent); border-radius: 10px; }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: var(--text-secondary);
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-of-type(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-of-type(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+
+    <div class="p-8">
+        <h1 class="text-3xl font-bold text-center">Standalone Gemini Chatbot</h1>
+        <p class="text-lg text-secondary text-center mt-2">This is an independent chatbot component that can be embedded anywhere.</p>
+    </div>
+
+    <!-- Chatbot -->
+    <div id="chatbot-container">
+        <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-accent text-primary w-16 h-16 rounded-full shadow-lg flex items-center justify-center animate-glow z-40 hover:scale-110 transition-transform">
+            <i data-lucide="message-circle" class="w-8 h-8"></i>
+        </button>
+
+        <div id="chatbot-window" class="fixed bottom-24 right-6 w-full max-w-sm h-full max-h-[600px] bg-foreground/80 backdrop-blur-lg rounded-2xl shadow-2xl flex-col z-40 hidden">
+            <div class="p-4 bg-foreground rounded-t-2xl flex justify-between items-center border-b border-accent/20 flex-shrink-0">
+                <h3 class="text-lg font-bold flex items-center gap-2"><i data-lucide="bot" class="text-accent"></i> AuraFlow Assistant</h3>
+                <button id="chatbot-close" class="text-secondary hover:text-primary"><i data-lucide="x"></i></button>
+            </div>
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4">
+                <!-- Welcome Message -->
+                <div class="flex gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center flex-shrink-0"><i data-lucide="bot" class="w-5 h-5"></i></div>
+                    <div class="bg-accent/20 p-3 rounded-lg max-w-xs text-sm">
+                        <p>Hello! I'm the AuraFlow Assistant. Ask me anything about the financial data provided to me.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-accent/20 flex-shrink-0">
+                <form id="chat-form" class="flex items-center gap-2">
+                    <input type="text" id="chat-input" placeholder="Ask a question..." class="w-full bg-foreground/50 border border-accent/30 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 ring-accent text-primary transition">
+                    <button type="submit" class="bg-accent text-primary p-2 rounded-lg hover:bg-accent/80 transition-colors"><i data-lucide="send"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Data context for the chatbot. In a real application, this might be fetched
+        // from an API or passed from the parent window.
+        const chatbotDataContext = {
+            "studentView": {
+                "welcomeMessage": "Hello Priya! See exactly where your fees create value 👇",
+                "widgets": [
+                    { "type": "pieChart", "title": "Your Annual Fee Allocation", "data": [
+                        { "label": "Academics", "value": 40 }, 
+                        { "label": "Facilities", "value": 25 }, 
+                        { "label": "Scholarships", "value": 20 }, 
+                        { "label": "Clubs & Activities", "value": 15 }
+                    ]},
+                    { "type": "barChart", "title": "Fest Budget Manager: 'Cognitia'", "data": [
+                        { "label": "Budget", "value": 500000 }, 
+                        { "label": "Spent", "value": 320000 }, 
+                        { "label": "Remaining", "value": 180000 }
+                    ]},
+                    { "type": "detailedAuditTrail", "title": "Expenditures Funded by Your Fee Batch", "entries": [
+                        { "transactionId": "TXN_LAB_01", "item": "Dept. of Science Lab Equipment", "amount": 200000, "status": "Verified ✅" }
+                    ]}
+                ]
+            }
+        };
+
+        const chatbotToggle = document.getElementById('chatbot-toggle');
+        const chatbotWindow = document.getElementById('chatbot-window');
+        const chatbotClose = document.getElementById('chatbot-close');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+
+        // --- GEMINI API INTEGRATION ---
+        const getChatbotResponse = async (userMessage) => {
+            addMessageToChat('bot', '', true); // Show typing indicator
+
+            const systemInstruction = `You are AuraFlow Assistant, a helpful AI guide for the AuraFlow financial transparency platform. Your purpose is to help users understand financial data related to their institution. Be concise, friendly, and focus on explaining the financial concepts and data presented to you. Use the provided data context to answer user questions accurately. Do not invent data. If you don't know the answer from the context, say that you cannot find that information. Analyze the data to provide insights where possible.`;
+            
+            const prompt = `Based on the following JSON data for the current user's view, please answer the user's question.
+        
+Data Context: 
+${JSON.stringify(chatbotDataContext, null, 2)}
+
+User Question: "${userMessage}"`;
+            
+            // IMPORTANT: Add your Gemini API Key here.
+            const apiKey = "AIzaSyB7TrfwZMMothhbuoKtvmZgd9YxwnYQH5c"; // Left empty for environment injection
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            if (apiKey === "") {
+                const typingIndicator = chatMessages.querySelector('.typing-indicator-container');
+                 if (typingIndicator) {
+                     typingIndicator.innerHTML = `
+                        <div class="w-8 h-8 rounded-full bg-danger/50 flex items-center justify-center flex-shrink-0"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div>
+                        <div class="bg-danger/20 p-3 rounded-lg max-w-xs text-sm">
+                            <p><strong>Configuration Error:</strong><br>The Gemini API key is missing. Please add it to the script to enable the chatbot.</p>
+                        </div>
+                    `;
+                    typingIndicator.classList.remove('typing-indicator-container');
+                    lucide.createIcons();
+                }
+                return;
+            }
+
+            const apiPayload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] },
+                generationConfig: { "temperature": 0.5, "topP": 0.95, "topK": 40 }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(apiPayload)
+                });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                const typingIndicator = chatMessages.querySelector('.typing-indicator-container');
+                if (typingIndicator) {
+                    typingIndicator.innerHTML = `
+                        <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center flex-shrink-0"><i data-lucide="bot" class="w-5 h-5"></i></div>
+                        <div class="bg-accent/20 p-3 rounded-lg max-w-xs text-sm">
+                            <p>${text ? text.replace(/\n/g, '<br>') : "Sorry, I couldn't generate a response."}</p>
+                        </div>
+                    `;
+                    typingIndicator.classList.remove('typing-indicator-container');
+                    lucide.createIcons();
+                }
+                
+            } catch (error) {
+                console.error("Gemini API call failed:", error);
+                 const typingIndicator = chatMessages.querySelector('.typing-indicator-container');
+                if (typingIndicator) {
+                     typingIndicator.innerHTML = `
+                        <div class="w-8 h-8 rounded-full bg-danger/50 flex items-center justify-center flex-shrink-0"><i data-lucide="bot" class="w-5 h-5"></i></div>
+                        <div class="bg-danger/20 p-3 rounded-lg max-w-xs text-sm">
+                            <p>Sorry, I'm having trouble connecting right now.</p>
+                        </div>
+                    `;
+                    typingIndicator.classList.remove('typing-indicator-container');
+                    lucide.createIcons();
+                }
+            }
+        };
+
+        // --- CHATBOT LOGIC ---
+        const addMessageToChat = (sender, message, isTyping = false) => {
+            const messageEl = document.createElement('div');
+            messageEl.classList.add('flex', 'gap-2.5', 'animate-in');
+
+            if (isTyping) {
+                messageEl.classList.add('typing-indicator-container');
+                messageEl.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center flex-shrink-0"><i data-lucide="bot" class="w-5 h-5"></i></div>
+                    <div class="bg-accent/20 p-3 rounded-lg max-w-xs text-sm flex items-center typing-indicator">
+                       <span></span><span></span><span></span>
+                    </div>`;
+            } else if (sender === 'user') {
+                messageEl.classList.add('justify-end');
+                messageEl.innerHTML = `
+                     <div class="bg-accent p-3 rounded-lg max-w-xs text-sm">
+                        <p>${message}</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-foreground/50 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="user" class="w-5 h-5 text-secondary"></i>
+                    </div>`;
+            }
+            
+            chatMessages.appendChild(messageEl);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            lucide.createIcons();
+        };
+
+        const handleChatSubmit = (e) => {
+            e.preventDefault();
+            const userMessage = chatInput.value.trim();
+            if (!userMessage) return;
+
+            addMessageToChat('user', userMessage);
+            chatInput.value = '';
+            
+            setTimeout(() => {
+                getChatbotResponse(userMessage);
+            }, 500);
+        };
+        
+        // --- APP INITIALIZATION ---
+        const init = () => {
+            // Chatbot event listeners
+            chatbotToggle.addEventListener('click', () => {
+                chatbotWindow.classList.toggle('hidden');
+                if(!chatbotWindow.classList.contains('hidden')) {
+                    chatInput.focus();
+                }
+            });
+            chatbotClose.addEventListener('click', () => chatbotWindow.classList.add('hidden'));
+            chatForm.addEventListener('submit', handleChatSubmit);
+
+            lucide.createIcons();
+        };
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

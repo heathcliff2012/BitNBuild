@@ -39,12 +39,47 @@ router.get('/public-ledger', (req, res) => {
   res.render('public-ledger');
 });
 
-router.get('/community-feedback', (req, res) => {
+router.get('/feedback', (req, res) => {
   res.render('feedback');
 });
 
 router.get('/transport', (req, res) => {
   res.render('transport');
 });
+
+router.get('/college-funds', (req, res) => {
+  res.render('college-funds');
+});
+
+router.get('/education', (req, res) => {
+  res.render('education');
+});
+
+router.get('/healthcare', (req, res) => {
+  res.render('healthcare');
+});
+
+router.get('/subsidies', (req, res) => {
+  res.render('subsidies');
+});
+
+router.get('../ledgers/infrastructure', (req, res) => {
+  res.render('infrastructure');
+});
+
+router.get('/community-feedback', (req, res) => {
+  res.render('feedback');
+});
+
+
+router.get('/chatbot', (req, res) => {
+  res.render('chatbot');
+});
+
+router.get('/', (req, res) => {
+  res.render('home');
+});
+
+
 
 module.exports = router;

@@ -34,10 +34,10 @@
         // --- GNEWS API INTEGRATION ---
         const fetchNews = async () => {
             // IMPORTANT: Replace with your actual GNews API key.
-            const apiKey = 'YOUR_GNEWS_API_KEY_HERE'; 
+            const apiKey = '9f9a725cf16c160da14a55bca1879d57'; 
             const newsContainer = document.getElementById('news-section-container');
             
-            if (apiKey === 'YOUR_GNEWS_API_KEY_HERE') {
+            if (apiKey === '9f9a725cf16c160da14a55bca1879d57E') {
                 newsContainer.innerHTML = `
                     <div class="text-center bg-foreground/50 p-6 rounded-2xl">
                         <h3 class="text-xl font-bold text-highlight">News Service Not Configured</h3>
