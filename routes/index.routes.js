@@ -6,7 +6,20 @@ router.get('/dashboard-admin', (req, res) => {
 });
 
 router.get('/dashboard-public', (req, res) => {
-  res.render('dashboard-public');
+  const username = req.cookies.username
+  res.render('dashboard-public', { username: username });
+});
+
+router.get('/public-ledger', (req, res) => {
+  res.render('public-ledger');
+});
+
+router.get('/community-feedback', (req, res) => {
+  res.render('feedback');
+});
+
+router.get('/ledger_transport.html', (req, res) => {
+  res.render('ledger_transport');
 });
 
 module.exports = router;

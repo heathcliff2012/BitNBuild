@@ -41,7 +41,7 @@ router.post('/public-login',
             { expiresIn: '2h' }
         );
         res.cookie('token', token); 
-        res.redirect('/dashboard-public');
+        res.render('dashboard-public', { username: user.username });
     }
 );
 
