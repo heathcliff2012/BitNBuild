@@ -1,4 +1,6 @@
 const express = require('express');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 const app = express();
 const path = require('path');
 const userRoutes = require('./routes/user.routes');
