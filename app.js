@@ -16,6 +16,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
+    console.log('Server is running on http://localhost:3000');
 });
 
 
