@@ -61,12 +61,12 @@
         const appState = {
             totalBudget: 50000000000,
             publicAllocations: [
-                { "id": "transport", "title": "Public Transport", "allocation": 0, "description": "", "icon": "bus-front", "page": "transport" },
-                { "id": "infrastructure", "title": "Urban Infrastructure", "allocation": 0, "description": "", "icon": "building-2", "page": "infrastructure" },
-                { "id": "education", "title": "Public Education", "allocation": 0, "description": "", "icon": "graduation-cap", "page": "education" },
-                { "id": "subsidies", "title": "Citizen Subsidies", "allocation": 0, "description": "", "icon": "receipt", "page": "subsidies" },
-                { "id": "college_funds", "title": "Higher Education Grants", "allocation": 0, "description": "", "icon": "book-marked", "page": "college-funds" },
-                { "id": "healthcare", "title": "Public Healthcare", "allocation": 0, "description": "", "icon": "heart-pulse", "page": "healthcare" }
+                { "id": "transport", "title": "Public Transport", "allocation": Number('<%= typeof allocation !== "undefined" ? allocation : 0 %>'), "description": '<%= typeof description !== "undefined" ? description : "" %>', "icon": "bus-front", "page": "transport" },
+                { "id": "infrastructure", "title": "Urban Infrastructure", "allocation": Number('<%= typeof allocation !== "undefined" ? allocation : 0 %>'), "description": '<%= typeof description !== "undefined" ? description : "" %>', "icon": "building-2", "page": "infrastructure" },
+                { "id": "education", "title": "Public Education", "allocation": Number('<%= typeof allocation !== "undefined" ? allocation : 0 %>'), "description": '<%= typeof description !== "undefined" ? description : "" %>', "icon": "graduation-cap", "page": "education" },
+                { "id": "subsidies", "title": "Citizen Subsidies", "allocation": Number('<%= typeof allocation !== "undefined" ? allocation : 0 %>'), "description": '<%= typeof description !== "undefined" ? description : "" %>', "icon": "receipt", "page": "subsidies" },
+                { "id": "college_funds", "title": "Higher Education Grants", "allocation": Number('<%= typeof allocation !== "undefined" ? allocation : 0 %>'), "description": '<%= typeof description !== "undefined" ? description : "" %>', "icon": "book-marked", "page": "college-funds" },
+                { "id": "healthcare", "title": "Public Healthcare", "allocation": Number('<%= typeof allocation !== "undefined" ? allocation : 0 %>'), "description": '<%= typeof description !== "undefined" ? description : "" %>', "icon": "heart-pulse", "page": "healthcare" }
             ],
             forumComments: [
                 { comment: "Can we get a more detailed breakdown of the 'road maintenance' allocation under Public Transport?" },
@@ -84,7 +84,7 @@
 
         // --- RENDER FUNCTIONS ---
         const renderAdminDashboard = () => {
-            const totalAllocated = appState.publicAllocations.reduce((sum, item) => sum + item.allocation, 0);
+            const totalAllocated = appState.publicAllocations.reduce((sum, item) => sum + Number(item.allocation), 0);
             const isOverrun = totalAllocated > appState.totalBudget;
 
             contentArea.innerHTML = `

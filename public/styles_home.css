@@ -340,3 +340,34 @@
 .widget-card:hover {
              border-color: rgba(6, 182, 212, 0.5);
         }
+
+        /* Chatbot styles */
+        #chatbot-window {
+            transform-origin: bottom right;
+            transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s ease-out;
+            display: flex; /* Use flex instead of toggling display for animation */
+        }
+        #chatbot-window.hidden {
+            transform: scale(0.5);
+            opacity: 0;
+            pointer-events: none;
+        }
+        #chat-messages::-webkit-scrollbar { width: 6px; }
+        #chat-messages::-webkit-scrollbar-thumb { background-color: var(--accent); border-radius: 10px; }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: var(--text-secondary);
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-of-type(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-of-type(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+        
