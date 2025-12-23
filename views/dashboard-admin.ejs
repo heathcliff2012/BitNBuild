@@ -63,13 +63,55 @@
     const appState = {
         totalBudget: Number('<%= typeof totalBudget !== "undefined" ? totalBudget : 5000000000 %>'),
         publicAllocations: [
-            { id: "transport", title: "<%= transport ? transport.title : 'Transport' %>", allocation: Number('<%= transport ? transport.allocation : 0 %>'), icon: "bus-front", page: "/transport" },
-            { id: "infrastructure", title: "<%= infrastructure ? infrastructure.title : 'Infrastructure' %>", allocation: Number('<%= infrastructure ? infrastructure.allocation : 0 %>'), icon: "building-2", page: "/infrastructure" },
-            { id: "education", title: "<%= education ? education.title : 'Education' %>", allocation: Number('<%= education ? education.allocation : 0 %>'), icon: "graduation-cap", page: "/education" },
-            { id: "healthcare", title: "<%= healthcare ? healthcare.title : 'Healthcare' %>", allocation: Number('<%= healthcare ? healthcare.allocation : 0 %>'), icon: "heart-pulse", page: "/healthcare" },
-            { id: "subsidies", title: "<%= subsidies ? subsidies.title : 'Subsidies' %>", allocation: Number('<%= subsidies ? subsidies.allocation : 0 %>'), icon: "receipt", page: "/subsidies" },
-            { id: "college_funds", title: "<%= college ? college.title : 'College Grants' %>", allocation: Number('<%= college ? college.allocation : 0 %>'), icon: "book-marked", page: "/college-funds" }
-        ],
+    { 
+        id: "transport", 
+        title: "<%= transport ? transport.title : 'Transport' %>", 
+        description: "<%= transport ? transport.description : 'Public transit and road maintenance.' %>",
+        allocation: Number('<%= transport ? transport.allocation : 0 %>'), 
+        icon: "bus-front", 
+        page: "/transport" 
+    },
+    { 
+        id: "infrastructure", 
+        title: "<%= infrastructure ? infrastructure.title : 'Infrastructure' %>", 
+        description: "<%= infrastructure ? infrastructure.description : 'City development and public works.' %>",
+        allocation: Number('<%= infrastructure ? infrastructure.allocation : 0 %>'), 
+        icon: "building-2", 
+        page: "/infrastructure" 
+    },
+    { 
+        id: "education", 
+        title: "<%= education ? education.title : 'Education' %>", 
+        description: "<%= education ? education.description : 'Funding for schools and learning resources.' %>",
+        allocation: Number('<%= education ? education.allocation : 0 %>'), 
+        icon: "graduation-cap", 
+        page: "/education" 
+    },
+    { 
+        id: "healthcare", 
+        title: "<%= healthcare ? healthcare.title : 'Healthcare' %>", 
+        description: "<%= healthcare ? healthcare.description : 'Public health services and hospital support.' %>",
+        allocation: Number('<%= healthcare ? healthcare.allocation : 0 %>'), 
+        icon: "heart-pulse", 
+        page: "/healthcare" 
+    },
+    { 
+        id: "subsidies", 
+        title: "<%= subsidies ? subsidies.title : 'Subsidies' %>", 
+        description: "<%= subsidies ? subsidies.description : 'Financial support for essential services.' %>",
+        allocation: Number('<%= subsidies ? subsidies.allocation : 0 %>'), 
+        icon: "receipt", 
+        page: "/subsidies" 
+    },
+    { 
+        id: "college_funds", 
+        title: "<%= college ? college.title : 'College Grants' %>", 
+        description: "<%= college ? college.description : 'Financial aid and scholarships for students.' %>",
+        allocation: Number('<%= college ? college.allocation : 0 %>'), 
+        icon: "book-marked", 
+        page: "/college-funds" 
+    }
+],
       // FIX: Inject the server-side 'comments' variable into a client-side array
         forumComments: <%- JSON.stringify(
             (typeof comments !== 'undefined' && comments.length > 0) 
@@ -109,6 +151,7 @@
                         </div>
                         <h3 class="text-xl font-bold mb-1">${item.title}</h3>
                         <p class="text-2xl font-black text-white">₹${(item.allocation/10000000).toFixed(2)} Cr</p>
+                        <p class="text-sm text-secondary mt-2 font-bold">${item.description}</p>
                         <a href="${item.page}" class="mt-6 block text-center py-2 bg-white/5 rounded-lg border border-white/10 hover:bg-accent/10 transition">Manage</a>
                     </div>
                 `).join('')}
