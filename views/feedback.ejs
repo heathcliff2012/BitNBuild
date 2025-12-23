@@ -4,267 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AuraFlow: Community Forum</title>
-    <link rel="icon" href="https://placehold.co/32x32/22c55e/ffffff?text=A">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
-        /* Reusing the same theme variables and base styles from the dashboard */
         :root {
             --background: radial-gradient(circle at 20% 30%, #2563eb, #22c55e);
-            --foreground: rgba(0,0,0,0.2);
-            --text-primary: #f8fafc;
-            --text-secondary: #d1fae5;
             --accent: #06b6d4;
-            --highlight: #fcd34d;
-            --danger: #f87171;
-            font-family: 'Inter', sans-serif;
         }
-
-        body {
-            background-color: #0b1120;
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMDAnIGhlaWdodD0nMTAwJyB2aWV3Qm94PScwIDAgMTAwIDEwMCc+PGcgZmlsbC1ydWxlPSdldmVub2RkJz48ZyBmaWxsPScjZjhmYWZjJyBmaWxsLW9wYWNpdHk9JzAuMDUnPjxwYXRoIG9wYWNpdHk9Jy41JyBkPSdNOTYgOTVoNHYxaC00djRoLTF2LTRoLTl2NGgtMXYtNGgtOXY0aC0xdi00aC05djRoLTF2LTRoLTl2NGgtMXYtNGgtOXY0aC0xdi00aC05djRoLTF2LTRoLTl2NGgtMXYtNGgtNHYtMWg0di05aC00di0xaDR2LTloLTR2LTFoNHYtOWgtNHYtMWg0di05aC00di0xaDR2LTloLTR2LTFoNHYtOWgtNHYtMWg0di05aC00di0xaDR2LTRoMXY0aDl2LTRoMXY0aDl2LTRoMXY0aDl2LTRoMXY0aDl2LTRoMXY0aDl2LTRoMXY0aDl2LTRoMXY0aDR2MWgtNHY5aDR2MWgtNHY5aDR2MWgtNHY5aDR2MWgtNHY5aDR2MWgtNHY5aDR2MWgtNHY5aDR2MWgtNHY5aDR2MUg2di05SDB2LTFoNnYtOUgwdi0xaDZ2LTlIMHYtMWg2di05SDB2LTFoNnYtOUgwdi0xaDZ2LTlIMHYtMWg2VjV6Jy8+PHBhdGggZD0nTTYgNVYwaDF2NWg5VjBoMXY1aDlWMGgxdiVoOVYwaDF2NWg5VjBoMXY1aDlWMGgxdiVoOVYwaDF2NWg0djFoLTR2OWg0djFoLTR2OWg0djFoLTR2OWg0djFoLTR2OWg0djFoLTR2OWg0djFoLTR2OWg0djFIOHYtOUgwdi0xaDZ2LTlIMHYtMWg2di05SDB2LTFoNnYtOUgwdi0xaDZ2LTlIMHYtMWg2di05SDB2LTFoNlY1ek0nLz48L2c+PC9nPjwvc3ZnPg=="), var(--background);
-            background-attachment: fixed;
-            color: var(--text-primary);
-            background-size: 200% 200%;
-            animation: gradient-flow 15s ease infinite;
-        }
-
-        #background-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-        
-        @keyframes gradient-flow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes slide-up {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slide-up { animation: slide-up 0.5s ease-out forwards; }
-        
-        .btn-secondary-animated {
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-        .btn-secondary-animated:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 20px -5px var(--accent);
-            transform: translateY(-2px);
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background-color: var(--accent); border-radius: 20px; }
-
-        /* Comment Section Specific Styles */
-        .comment-card {
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-        .comment-card:hover {
-             border-color: rgba(6, 182, 212, 0.5);
-        }
-        
-        .comment-textarea {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .comment-textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 15px -3px var(--accent);
-        }
-        
-        .like-btn.liked i {
-            fill: #ef4444;
-            stroke: #ef4444;
-            animation: like-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes like-pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-        }
+        body { background: #0b1120 var(--background) fixed; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .comment-card { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
+        .comment-card:hover { border-color: var(--accent); }
     </style>
 </head>
 <body class="antialiased min-h-screen">
 
-    <canvas id="background-canvas"></canvas>
-
-    <div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
-        <header class="text-center py-8 animate-slide-up">
-            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-f8fafc">Community Forum</h1>
-            <p class="mt-3 max-w-2xl mx-auto text-lg text-d1fae5">Share your feedback, ask questions, and discuss with the community.</p>
+    <div class="max-w-4xl mx-auto p-6 lg:p-12">
+        <header class="text-center mb-12">
+            <h1 class="text-5xl font-extrabold italic mb-3">Community Forum</h1>
+            <p class="text-emerald-200/60">Your feedback helps shape a better city budget.</p>
+            <div class="flex items-center space-x-2">
+            <a href="/dashboard-public" class="bg-slate-800/50 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 border border-white/10 hover:border-accent transition">
+                <i data-lucide="home" class="w-4 h-4"></i> Home
+            </a>
+     </div>
         </header>
 
-        <main id="comment-section" class="space-y-8">
-            <!-- New Comment Form -->
-            <div class="comment-card rounded-2xl p-6 animate-slide-up" style="animation-delay: 100ms;">
-                <div class="flex items-start">
-                    <div class="flex-grow">
-                        <form id="comment-form">
-                            <textarea id="comment-input" class="comment-textarea w-full rounded-lg p-3 text-f8fafc placeholder-gray-400 resize-none" rows="3" placeholder="Add your comment..." required></textarea>
-                            <div class="flex justify-end mt-3">
-                                <button type="submit" class="btn-secondary-animated inline-flex items-center gap-2 bg-slate-800/50 text-f8fafc font-semibold py-2 px-6 rounded-lg">
-                                    <i data-lucide="send" class="w-4 h-4"></i>
-                                    <span>Post</span>
-                                </button>
-                            </div>
-                        </form>
+        <main class="space-y-8">
+            <div class="comment-card rounded-3xl p-6 border-accent/20">
+                <form action="/community-feedback" method="POST">
+                    <textarea name="text" class="w-full bg-black/30 rounded-2xl p-4 text-white placeholder-white/20 border border-white/5 focus:border-accent outline-none transition" rows="3" placeholder="Add your feedback..." required></textarea>
+                    <div class="flex justify-end mt-4">
+                        <button type="submit" class="bg-accent text-white font-bold py-2 px-8 rounded-xl hover:scale-105 transition flex items-center gap-2">
+                            <i data-lucide="send" class="w-4 h-4"></i> Post to Forum
+                        </button>
                     </div>
-                </div>
+                </form>
             </div>
 
-            <!-- Comments List -->
-            <div id="comments-container" class="space-y-6">
-                <!-- Comments will be dynamically inserted here -->
-            </div>
+<div id="comments-container" class="space-y-6">
+    <% if (comments && comments.length > 0) { %>
+        <% comments.forEach(comment => { %>
+            <article class="comment-card rounded-2xl p-6">
+                <header class="flex justify-between items-start mb-3">
+                    <div>
+                        <p class="font-bold text-cyan-300"><%= comment.username || 'Anonymous' %></p>
+                        <time datetime="<%= new Date(comment.createdAt).toISOString() %>" class="text-xs text-white/40">
+                            <%= new Date(comment.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) %>
+                        </time>
+                    </div>
+                </header>
+                <div class="prose prose-invert max-w-none text-slate-200">
+                    <p><%= comment.text %></p>
+                </div>
+            </article>
+        <% }) %>
+    <% } else { %>
+        <div class="text-center py-16 border-2 border-dashed border-white/10 rounded-2xl">
+            <i data-lucide="message-square-dashed" class="w-12 h-12 mx-auto text-white/20 mb-4"></i>
+            <p class="text-white/40">No feedback yet. Be the first to share your thoughts!</p>
+        </div>
+    <% } %>
+</div>
         </main>
     </div>
 
-    <script type="module">
-        // --- UTILITY FUNCTIONS ---
-        // timeAgo function is removed as it's no longer needed.
-
-        // --- RENDER FUNCTIONS ---
-        const createCommentHTML = (comment, isReply = false) => {
-            const delay = Math.random() * 200;
-            return `
-                <div class="flex items-start animate-slide-up" style="animation-delay: ${delay}ms;">
-                    <div class="flex-grow">
-                        <div class="comment-card rounded-2xl p-4">
-                            <!-- Timestamp removed -->
-                            <p class="text-d1fae5">${comment.text}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-        };
-
-        const renderComments = () => {
-            const container = document.getElementById('comments-container');
-            container.innerHTML = mockComments.map(comment => createCommentHTML(comment)).join('');
-            lucide.createIcons();
-            // Event listeners for comments are no longer needed
-        };
-
-        // --- EVENT LISTENERS ---
-        // The addCommentEventListeners function is no longer needed and can be removed.
-        
-        document.getElementById('comment-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const input = document.getElementById('comment-input');
-            const commentText = input.value.trim();
-            if(commentText){
-                const newComment = {
-                    id: Date.now(),
-                    text: commentText,
-                };
-                mockComments.unshift(newComment); // Add to the beginning of the array
-                renderComments();
-                input.value = '';
-            }
-        });
-
-        // --- BACKGROUND CONSTELLATION ANIMATION (Same as dashboard) ---
-        const setupConstellation = () => {
-            const canvas = document.getElementById('background-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let particles = [];
-            const particleCount = window.innerWidth > 768 ? 100 : 40;
-            const maxDistance = 120;
-
-            const resizeCanvas = () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                initParticles();
-            };
-            window.addEventListener('resize', resizeCanvas);
-            
-            class Particle {
-                constructor(x, y, dX, dY, size, color) { this.x=x; this.y=y; this.directionX=dX; this.directionY=dY; this.size=size; this.color=color; }
-                draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill(); }
-                update() {
-                    if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
-                    if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
-                    this.x += this.directionX; this.y += this.directionY; this.draw();
-                }
-            }
-            
-            const initParticles = () => {
-                particles = [];
-                for (let i = 0; i < particleCount; i++) {
-                    let size = Math.random() * 2 + 1;
-                    let x = Math.random() * (canvas.width - size*2) + size;
-                    let y = Math.random() * (canvas.height - size*2) + size;
-                    let dX = (Math.random()*0.4)-0.2;
-                    let dY = (Math.random()*0.4)-0.2;
-                    particles.push(new Particle(x, y, dX, dY, size, 'rgba(6, 182, 212, 0.7)'));
-                }
-            };
-            
-            const connectParticles = () => {
-                for (let a = 0; a < particles.length; a++) {
-                    for (let b = a; b < particles.length; b++) {
-                        let dist = ((particles[a].x - particles[b].x) ** 2) + ((particles[a].y - particles[b].y) ** 2);
-                        if (dist < (maxDistance ** 2)) {
-                            let opacity = 1 - (dist / (maxDistance ** 2));
-                            ctx.strokeStyle = `rgba(209, 250, 229, ${opacity * 0.5})`;
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.moveTo(particles[a].x, particles[a].y);
-                            ctx.lineTo(particles[b].x, particles[b].y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-            };
-
-            const animate = () => {
-                requestAnimationFrame(animate);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => p.update());
-                connectParticles();
-            };
-            
-            resizeCanvas();
-            animate();
-        };
-        
-        // --- APP INITIALIZATION ---
-        const init = () => {
-            setupConstellation();
-            renderComments();
-            lucide.createIcons();
-        };
-
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>
-
-
-
-

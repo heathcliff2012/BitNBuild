@@ -4,291 +4,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AuraFlow: Admin Dashboard</title>
-    <link rel="icon" href="https://placehold.co/32x32/22c55e/ffffff?text=A">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="../public/styles_home.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --background: radial-gradient(circle at 20% 30%, #2563eb, #22c55e);
+            --foreground: rgba(0,0,0,0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #d1fae5;
+            --accent: #06b6d4;
+            --highlight: #fcd34d;
+            --danger: #f87171;
+        }
+        body { background: #0b1120 var(--background) fixed; color: var(--text-primary); font-family: 'Inter', sans-serif; }
+        .widget-card { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
+        .widget-card:hover { border-color: var(--accent); }
+        .animate-slide-up { animation: slideUp 0.5s ease-out forwards; opacity: 0; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+    </style>
 </head>
 <body class="antialiased min-h-screen">
     
     <canvas id="background-canvas"></canvas>
 
-    <!-- Main Container -->
     <div id="app-container" class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        <!-- App Header -->
         <header class="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
             <div>
-                <h1 class="text-3xl font-bold text-primary">Admin Dashboard</h1>
+                <h1 class="text-3xl font-bold text-white">Admin Dashboard</h1>
                 <p class="text-sm text-secondary">Public Fund Allocation Management</p>
             </div>
             <div class="flex items-center space-x-2">
-                 <a href="/feedback" class="btn-secondary-animated bg-slate-800/50 text-primary font-semibold py-2 px-4 rounded-lg flex items-center gap-2">
-                    <i data-lucide="messages-square" class="w-4 h-4"></i>
-                    Forum
+                 <a href="/community-feedback" class="bg-slate-800/50 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 border border-white/10 hover:border-accent transition">
+                    <i data-lucide="messages-square" class="w-4 h-4 text-accent"></i> Forum
                 </a>
-                 <a href="/dashboard-public" class="btn-secondary-animated bg-slate-800/50 text-primary font-semibold py-2 px-4 rounded-lg flex items-center gap-2">
-                    <i data-lucide="home" class="w-4 h-4"></i>
-                    Home
+                 <a href="/dashboard-public" class="bg-slate-800/50 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 border border-white/10 hover:border-accent transition">
+                    <i data-lucide="home" class="w-4 h-4"></i> Home
                 </a>
             </div>
         </header>
 
-        <!-- Dynamic Content Area -->
-        <main id="content-area">
-            <!-- Admin dashboard will be rendered here -->
-        </main>
+        <main id="content-area"></main>
     </div>
 
-    <!-- Total Budget Modal -->
-    <div id="budget-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden modal-overlay">
-        <div class="widget-card rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4 modal-content">
-            <h2 class="text-2xl font-bold text-primary flex items-center gap-3"><i data-lucide="coins" class="text-highlight"></i>Set Total Budget</h2>
-            <p class="text-secondary mt-2 mb-6">Define the total available budget for all public allocations.</p>
-            <div>
-                <label for="total-budget-input" class="text-sm font-medium text-secondary">Total Budget (INR)</label>
-                <input id="total-budget-input" type="number" class="mt-1 block w-full text-2xl bg-black/20 p-3 rounded-lg border-2 border-slate-600 focus:border-accent focus:ring-accent transition" placeholder="e.g., 500000000">
-            </div>
+    <div id="budget-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
+        <div class="widget-card rounded-2xl p-8 w-full max-w-md mx-4">
+            <h2 class="text-2xl font-bold text-white flex items-center gap-3"><i data-lucide="coins" class="text-highlight"></i>Set Total Budget</h2>
+            <input id="total-budget-input" type="number" class="mt-6 block w-full text-2xl bg-black/40 p-3 rounded-xl border border-white/10 text-white outline-none focus:border-accent">
             <div class="mt-8 flex justify-end space-x-3">
-                <button id="close-modal-btn" class="btn-secondary-animated bg-slate-800/50 text-primary font-semibold py-2 px-5 rounded-lg">Cancel</button>
-                <button id="save-budget-btn" class="bg-highlight text-black font-bold py-2 px-5 rounded-lg hover:scale-105 transition transform">Save Budget</button>
+                <button id="close-modal-btn" class="text-secondary px-4 py-2">Cancel</button>
+                <button id="save-budget-btn" class="bg-highlight text-black font-bold py-2 px-6 rounded-lg">Save Budget</button>
             </div>
         </div>
     </div>
 
+<script type="module">
+    // --- STATE & DATA ---
+    const appState = {
+        totalBudget: Number('<%= typeof totalBudget !== "undefined" ? totalBudget : 5000000000 %>'),
+        publicAllocations: [
+            { id: "transport", title: "<%= transport ? transport.title : 'Transport' %>", allocation: Number('<%= transport ? transport.allocation : 0 %>'), icon: "bus-front", page: "/transport" },
+            { id: "infrastructure", title: "<%= infrastructure ? infrastructure.title : 'Infrastructure' %>", allocation: Number('<%= infrastructure ? infrastructure.allocation : 0 %>'), icon: "building-2", page: "/infrastructure" },
+            { id: "education", title: "<%= education ? education.title : 'Education' %>", allocation: Number('<%= education ? education.allocation : 0 %>'), icon: "graduation-cap", page: "/education" },
+            { id: "healthcare", title: "<%= healthcare ? healthcare.title : 'Healthcare' %>", allocation: Number('<%= healthcare ? healthcare.allocation : 0 %>'), icon: "heart-pulse", page: "/healthcare" },
+            { id: "subsidies", title: "<%= subsidies ? subsidies.title : 'Subsidies' %>", allocation: Number('<%= subsidies ? subsidies.allocation : 0 %>'), icon: "receipt", page: "/subsidies" },
+            { id: "college_funds", title: "<%= college ? college.title : 'College Grants' %>", allocation: Number('<%= college ? college.allocation : 0 %>'), icon: "book-marked", page: "/college-funds" }
+        ],
+      // FIX: Inject the server-side 'comments' variable into a client-side array
+        forumComments: <%- JSON.stringify(
+            (typeof comments !== 'undefined' && comments.length > 0) 
+            ? comments.map(c => ({
+                username: c.username, 
+                text: c.text, 
+                date: new Date(c.createdAt).toLocaleDateString()
+              })) 
+            : [{ username: "System", text: "No recent community feedback.", date: "" }]
+        ) %> // Remove the semicolon from inside the EJS tag
+    };
 
-    <script type="module">
-        // --- STATE & DATA ---
-        const appState = {
-            totalBudget: 50000000000,
-            publicAllocations: [
-                { "id": "transport", "title": "Public Transport", "allocation": Number('<%= typeof allocation !== "undefined" ? allocation : 0 %>'), "description": '<%= typeof description !== "undefined" ? description : "" %>', "icon": "bus-front", "page": "transport" },
-                { "id": "infrastructure", "title": "Urban Infrastructure", "allocation": Number('<%= typeof allocation !== "undefined" ? allocation : 0 %>'), "description": '<%= typeof description !== "undefined" ? description : "" %>', "icon": "building-2", "page": "infrastructure" },
-                { "id": "education", "title": "Public Education", "allocation": Number('<%= typeof allocation !== "undefined" ? allocation : 0 %>'), "description": '<%= typeof description !== "undefined" ? description : "" %>', "icon": "graduation-cap", "page": "education" },
-                { "id": "subsidies", "title": "Citizen Subsidies", "allocation": Number('<%= typeof allocation !== "undefined" ? allocation : 0 %>'), "description": '<%= typeof description !== "undefined" ? description : "" %>', "icon": "receipt", "page": "subsidies" },
-                { "id": "college_funds", "title": "Higher Education Grants", "allocation": Number('<%= typeof allocation !== "undefined" ? allocation : 0 %>'), "description": '<%= typeof description !== "undefined" ? description : "" %>', "icon": "book-marked", "page": "college-funds" },
-                { "id": "healthcare", "title": "Public Healthcare", "allocation": Number('<%= typeof allocation !== "undefined" ? allocation : 0 %>'), "description": '<%= typeof description !== "undefined" ? description : "" %>', "icon": "heart-pulse", "page": "healthcare" }
-            ],
-            forumComments: [
-                { comment: "Can we get a more detailed breakdown of the 'road maintenance' allocation under Public Transport?" },
-                { comment: "The increase in healthcare funding is a great step. Where can we see the project proposals for the new community health programs?" },
-                { comment: "Is there a plan to include subsidies for electric vehicle charging infrastructure?" }
-            ]
-        };
+    const render = () => {
+        const totalAllocated = appState.publicAllocations.reduce((sum, item) => sum + item.allocation, 0);
+        const remaining = appState.totalBudget - totalAllocated;
+        const content = document.getElementById('content-area');
 
-        const contentArea = document.getElementById('content-area');
-        const budgetModal = document.getElementById('budget-modal');
-        const totalBudgetInput = document.getElementById('total-budget-input');
-        const saveBudgetBtn = document.getElementById('save-budget-btn');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-
-
-        // --- RENDER FUNCTIONS ---
-        const renderAdminDashboard = () => {
-            const totalAllocated = appState.publicAllocations.reduce((sum, item) => sum + Number(item.allocation), 0);
-            const isOverrun = totalAllocated > appState.totalBudget;
-
-            contentArea.innerHTML = `
-                ${createBudgetStatusWidget(totalAllocated, isOverrun)}
-                <h2 class="text-2xl font-bold text-primary mt-12 mb-6 animate-slide-up" style="animation-delay: 100ms;">Sector Allocations</h2>
-                <div id="allocation-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    ${appState.publicAllocations.map(createAllocationCard).join('')}
+        content.innerHTML = `
+            <div class="widget-card p-8 rounded-3xl animate-slide-up">
+                <div class="flex justify-between items-center mb-8">
+                    <div><h2 class="text-2xl font-bold">Budget Analysis</h2><p class="text-secondary">Summary of city funds</p></div>
+                    <button id="open-modal-btn" class="bg-white/5 border border-white/10 p-2 rounded-lg hover:bg-accent/10 transition"><i data-lucide="settings"></i></button>
                 </div>
-                ${createPublicForumWidget()}
-            `;
-            lucide.createIcons();
-        };
-
-        const createBudgetStatusWidget = (totalAllocated, isOverrun) => {
-            const remaining = appState.totalBudget - totalAllocated;
-            const remainingColor = isOverrun ? 'text-danger' : 'text-green-400';
-            const alertClass = isOverrun ? 'anomaly-alert' : '';
-            
-            return `
-                <div class="p-6 widget-card rounded-2xl mb-8 animate-slide-up ${alertClass}">
-                    <div class="flex flex-col md:flex-row justify-between items-start">
-                        <div>
-                            <h2 class="text-2xl font-bold text-primary">Budget Overview</h2>
-                            <p class="text-secondary mt-1">Real-time summary of public funds.</p>
-                        </div>
-                        <button id="open-modal-btn" class="mt-4 md:mt-0 btn-secondary-animated bg-slate-800/50 text-primary font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2">
-                            <i data-lucide="settings-2" class="w-4 h-4"></i> Allocate Total Budget
-                        </button>
-                    </div>
-                    ${isOverrun ? `
-                        <div class="mt-4 p-3 bg-danger/20 text-danger rounded-lg flex items-center gap-3">
-                            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
-                            <div>
-                                <h3 class="font-bold">Anomaly Detected: Budget Overrun</h3>
-                                <p class="text-sm">Total allocated funds exceed the total budget. Please review allocations.</p>
-                            </div>
-                        </div>
-                    ` : ''}
-                    <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-                        <div>
-                            <p class="text-sm text-secondary">Total Budget</p>
-                            <p class="text-3xl font-bold text-primary mt-1">₹${appState.totalBudget.toLocaleString('en-IN')}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-secondary">Total Allocated</p>
-                            <p class="text-3xl font-bold text-primary mt-1">₹${totalAllocated.toLocaleString('en-IN')}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-secondary">Remaining</p>
-                            <p class="text-3xl font-bold ${remainingColor} mt-1">₹${remaining.toLocaleString('en-IN')}</p>
-                        </div>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div><p class="text-xs text-secondary uppercase">Total Budget</p><p class="text-3xl font-black text-white">₹${(appState.totalBudget/10000000).toFixed(2)}Cr</p></div>
+                    <div><p class="text-xs text-secondary uppercase">Allocated</p><p class="text-3xl font-black text-white">₹${(totalAllocated/10000000).toFixed(2)}Cr</p></div>
+                    <div><p class="text-xs text-secondary uppercase">Remaining</p><p class="text-3xl font-black ${remaining < 0 ? 'text-red-400' : 'text-accent'}">₹${(remaining/10000000).toFixed(2)}Cr</p></div>
                 </div>
-            `;
-        };
+            </div>
 
-        const createAllocationCard = (item, index) => {
-            return `
-                <div class="widget-card p-6 rounded-2xl animate-slide-up flex flex-col justify-between" style="animation-delay: ${200 + index * 100}ms;" data-id="${item.id}">
-                    <div>
-                        <div class="flex items-start justify-between mb-4">
-                            <div>
-                                <h3 class="text-xl font-bold text-primary">${item.title}</h3>
-                                <p class="text-sm text-secondary mt-1">${item.description}</p>
-                            </div>
-                            <i data-lucide="${item.icon}" class="w-8 h-8 text-accent flex-shrink-0 ml-4"></i>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                ${appState.publicAllocations.map((item, i) => `
+                    <div class="widget-card p-6 rounded-2xl animate-slide-up" style="animation-delay: ${i*100}ms">
+                        <div class="flex justify-between items-start mb-6">
+                            <i data-lucide="${item.icon}" class="text-accent w-8 h-8"></i>
+                            <span class="text-[10px] font-bold text-accent uppercase border border-accent/30 px-2 py-1 rounded">Live</span>
                         </div>
-                        <div class="mt-6">
-                            <p class="text-3xl font-bold text-primary">₹${item.allocation.toLocaleString('en-IN')}</p>
+                        <h3 class="text-xl font-bold mb-1">${item.title}</h3>
+                        <p class="text-2xl font-black text-white">₹${(item.allocation/10000000).toFixed(2)} Cr</p>
+                        <a href="${item.page}" class="mt-6 block text-center py-2 bg-white/5 rounded-lg border border-white/10 hover:bg-accent/10 transition">Manage</a>
+                    </div>
+                `).join('')}
+            </div>
+
+            <div class="mt-12 animate-slide-up" style="animation-delay: 600ms">
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i data-lucide="message-square" class="text-accent"></i> Recent Community Feedback</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${appState.forumComments.map(c => `
+                        <div class="bg-black/20 p-4 rounded-xl border-l-4 border-accent">
+                            <div class="flex justify-between text-[10px] font-bold text-accent mb-2"><span>${c.username}</span><span>${c.date}</span></div>
+                            <p class="text-sm text-secondary">${c.text}</p>
                         </div>
-                    </div>
-                    <div class="mt-6">
-                        <a href="${item.page}" class="btn-glow-on-hover w-full block text-center text-secondary font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
-                            <i data-lucide="trending-up" class="w-4 h-4"></i> Dive Deeper
-                        </a>
-                    </div>
+                    `).join('')}
                 </div>
-            `;
-        };
+            </div>
+        `;
+        lucide.createIcons();
+    };
 
-        const createPublicForumWidget = () => {
-            return `
-                <div class="mt-12 animate-slide-up" style="animation-delay: 500ms;">
-                    <h2 class="text-2xl font-bold text-primary mb-6 flex items-center gap-3">
-                        <i data-lucide="messages-square" class="text-accent"></i> Public Forum Snippet
-                    </h2>
-                    <div class="widget-card rounded-2xl p-6 space-y-4">
-                        <div id="comment-list" class="space-y-4">
-                            ${appState.forumComments.map(createComment).join('')}
-                        </div>
-                    </div>
-                </div>
-            `;
-        };
-
-        const createComment = (comment) => {
-            return `<div class="bg-black/20 p-4 rounded-lg text-secondary">${comment.comment}</div>`;
-        };
-
-
-        // --- EVENT HANDLERS & LOGIC ---
-        const openBudgetModal = () => {
-            totalBudgetInput.value = appState.totalBudget;
-            budgetModal.classList.remove('hidden');
-        };
-
-        const closeBudgetModal = () => {
-            budgetModal.classList.add('hidden');
-        };
-
-        const saveTotalBudget = () => {
-            totalBudgetInput.classList.remove('border-danger');
-            const newValue = parseInt(totalBudgetInput.value, 10);
-            if (!isNaN(newValue) && newValue > 0) {
-                appState.totalBudget = newValue;
-                closeBudgetModal();
-                renderAdminDashboard(); 
-            } else {
-                totalBudgetInput.classList.add('border-danger');
+        // Modal Handlers
+        document.addEventListener('click', e => {
+            if(e.target.closest('#open-modal-btn')) {
+                document.getElementById('total-budget-input').value = appState.totalBudget;
+                document.getElementById('budget-modal').classList.remove('hidden');
             }
-        };
-        
-        // --- BACKGROUND CONSTELLATION ANIMATION ---
-        const setupConstellation = () => {
-            const canvas = document.getElementById('background-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let particles = [];
-            const particleCount = window.innerWidth > 768 ? 100 : 40;
-            const maxDistance = 120;
-
-            const resizeCanvas = () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                initParticles();
-            };
-            
-            class Particle {
-                constructor(x, y, dX, dY, size, color) { this.x=x; this.y=y; this.directionX=dX; this.directionY=dY; this.size=size; this.color=color; }
-                draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill(); }
-                update() {
-                    if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
-                    if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
-                    this.x += this.directionX; this.y += this.directionY; this.draw();
-                }
+            if(e.target.id === 'close-modal-btn' || e.target.id === 'budget-modal') {
+                document.getElementById('budget-modal').classList.add('hidden');
             }
-            
-            const initParticles = () => {
-                particles = [];
-                for (let i = 0; i < particleCount; i++) {
-                    let size = Math.random() * 2 + 1;
-                    let x = Math.random() * (canvas.width - size*2) + size;
-                    let y = Math.random() * (canvas.height - size*2) + size;
-                    let dX = (Math.random()*0.4)-0.2;
-                    let dY = (Math.random()*0.4)-0.2;
-                    particles.push(new Particle(x, y, dX, dY, size, 'rgba(6, 182, 212, 0.7)'));
-                }
-            };
-            
-            const connectParticles = () => {
-                for (let a = 0; a < particles.length; a++) {
-                    for (let b = a; b < particles.length; b++) {
-                        let dist = ((particles[a].x - particles[b].x) ** 2) + ((particles[a].y - particles[b].y) ** 2);
-                        if (dist < (maxDistance ** 2)) {
-                            let opacity = 1 - (dist / (maxDistance ** 2));
-                            ctx.strokeStyle = `rgba(209, 250, 229, ${opacity * 0.5})`;
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.moveTo(particles[a].x, particles[a].y);
-                            ctx.lineTo(particles[b].x, particles[b].y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-            };
-
-            const animate = () => {
-                requestAnimationFrame(animate);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => p.update());
-                connectParticles();
-            };
-            
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-            animate();
-        };
-
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            renderAdminDashboard();
-            setupConstellation();
-            
-            contentArea.addEventListener('click', (event) => {
-                if (event.target.closest('#open-modal-btn')) openBudgetModal();
-            });
-
-            saveBudgetBtn.addEventListener('click', saveTotalBudget);
-            closeModalBtn.addEventListener('click', closeBudgetModal);
-            budgetModal.addEventListener('click', (event) => {
-               if (event.target === budgetModal) closeBudgetModal();
-            });
         });
+
+        document.getElementById('save-budget-btn').onclick = () => {
+            appState.totalBudget = Number(document.getElementById('total-budget-input').value);
+            document.getElementById('budget-modal').classList.add('hidden');
+            render();
+        };
+
+        document.addEventListener('DOMContentLoaded', render);
     </script>
 </body>
 </html>
-

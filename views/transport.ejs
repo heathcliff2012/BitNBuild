@@ -54,24 +54,33 @@
             <section>
                 <h2 class="text-xl font-bold text-primary flex items-center gap-2"><i data-lucide="sliders-horizontal" class="w-5 h-5 text-accent"></i>Ledger Details</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                    <form action="/dashboard-admin" method="POST" class="col-span-1 md:col-span-2 space-y-6">
-                    <div>
-                        <label for="title" class="block text-sm font-medium text-secondary">Ledger Title</label>
-                        <input type="text" id="title" name="title" value="Public Transport" class="mt-1 block w-full bg-transparent border-0 border-b-2 border-accent/50 focus:ring-0 focus:border-accent transition p-2">
-                    </div>
-                    <div>
-                        <label for="allocation" class="block text-sm font-medium text-secondary">Allocation Amount (INR)</label>
-                        <input type="number" id="allocation" name="allocation" class="mt-1 block w-full bg-transparent border-0 border-b-2 border-accent/50 focus:ring-0 focus:border-accent transition p-2">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="description" class="block text-sm font-medium text-secondary">Description</label>
-                        <textarea id="description" name="description" rows="2" class="mt-1 block w-full bg-transparent border-0 border-b-2 border-accent/50 focus:ring-0 focus:border-accent transition p-2"></textarea>
-                    </div>
-                      <button type="submit" onclick="alert('Changes have been saved!')" class="bg-highlight text-black font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2">
+                <form action="/transport/<%= ledger._id %>?_method=PATCH" method="POST" class="col-span-1 md:col-span-2 space-y-6">
+    
+    <div>
+        <label for="title" class="block text-sm font-medium text-secondary">Ledger Title</label>
+        <input type="text" id="title" name="title" value="<%= ledger.title %>" 
+               class="mt-1 block w-full bg-transparent border-0 border-b-2 border-accent/50 focus:ring-0 focus:border-accent transition p-2">
+    </div>
+
+    <div>
+        <label for="allocation" class="block text-sm font-medium text-secondary">Allocation Amount</label>
+        <input type="number" id="allocation" name="allocation" value="<%= ledger.allocation %>" 
+               class="mt-1 block w-full bg-transparent border-0 border-b-2 border-accent/50 focus:ring-0 focus:border-accent transition p-2">
+    </div>
+
+    <div>
+        <label for="description" class="block text-sm font-medium text-secondary">Description</label>
+        <textarea id="description" name="description" 
+                  class="mt-1 block w-full bg-transparent border-0 border-b-2 border-accent/50 focus:ring-0 focus:border-accent transition p-2"><%= ledger.description %></textarea>
+    </div>
+
+    <div class="flex justify-end pt-6 border-t border-white/10">
+                <button type="submit" onclick="alert('Changes have been saved!')" class="bg-highlight text-black font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2">
                     <i data-lucide="save" class="w-5 h-5"></i>
                     Save All Changes
                 </button>
-                    </form>
+            </div>
+</form>
                 </div>
             </section>
 

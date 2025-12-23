@@ -6,6 +6,9 @@ const path = require('path');
 const userRoutes = require('./routes/user.routes');
 const adminRoutes = require('./routes/admin.routes');
 const indexRoutes = require('./routes/index.routes');
+// In your main app.js
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'));
 const dotenv = require('dotenv');
 dotenv.config();
 const connectDB = require('./config/db');
@@ -21,7 +24,6 @@ app.use(adminRoutes);
 app.use(indexRoutes);
 app.use(express.json());  
 app.use('/public', express.static(path.join(__dirname, 'public')));
-
 
 app.set('view engine', 'ejs');
 

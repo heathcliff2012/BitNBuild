@@ -3,29 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Public Ledger - AuraFlow</title>
-    <link rel="icon" href="https://placehold.co/32x32/22c55e/ffffff?text=A">
-    <link rel="stylesheet" href="../public/styles_home.css">
+    <title>AuraFlow: Public Verifiable Ledger</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: radial-gradient(circle at 20% 30%, #2563eb, #22c55e);
+            --foreground: rgba(255, 255, 255, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #d1fae5;
+            --accent: #06b6d4;
+        }
+        body { 
+            background: var(--background); 
+            color: var(--text-primary); 
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+        .animate-slide-up { animation: slideUp 0.6s ease-out forwards; opacity: 0; }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
 </head>
 <body class="antialiased min-h-screen">
     <canvas id="background-canvas"></canvas>
-    <!-- Main Container -->
-    <div id="app-container" class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        <main id="content-area">
-            <!-- Public Ledger content will be rendered here -->
-        </main>
-    </div>
 
-    <!-- Transaction Modal -->
-    <div id="transaction-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div id="modal-content" class="bg-foreground rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-scale-in p-6 sm:p-8 relative">
-            <!-- Modal content will be rendered here -->
+    <div class="max-w-7xl mx-auto p-6 lg:p-12">
+        <header class="flex flex-col lg:flex-row justify-between items-start mb-16 gap-8 animate-slide-up">
+            <div class="flex-1">
+                <h2 class="text-5xl font-black tracking-tighter mb-4">Public Verifiable Ledger</h2>
+                <p class="max-w-2xl text-lg text-secondary/80">Real-time overview of budget allocations across city sectors. These figures are synced with official records.</p>
+            </div>
+            
+            <div class="w-full lg:w-auto flex flex-col sm:flex-row gap-4">
+                <div class="relative group">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary/50 group-focus-within:text-accent transition-colors"></i>
+                    <input type="text" id="search-input" placeholder="Search sectors..." 
+                           class="w-full sm:w-80 bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-white placeholder:text-white/30 focus:border-accent outline-none transition-all">
+                </div>
+                <a href="/dashboard-public" class="bg-white/10 backdrop-blur-md border border-white/10 text-primary font-semibold py-3 px-8 rounded-2xl hover:bg-white/20 transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+                </a>
+            </div>
+        </header>
+
+        <div id="ledger-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+
+        <div id="no-results" class="hidden text-center py-20">
+            <i data-lucide="search-x" class="w-16 h-16 mx-auto text-secondary/30 mb-4"></i>
+            <h3 class="text-2xl font-bold">No sectors found</h3>
+            <p class="text-secondary/60">Try searching for a different keyword.</p>
         </div>
     </div>
 
-    <script type="module" src="../public/script_ledger.js"></script>
+    <script>
+        // --- DATA PREPARATION ---
+        const ledgerData = [
+            { id: "transport", title: "Transport", icon: "bus", description: `<%= transport ? transport.description : 'Funds for city transit and road maintenance.' %>`, budget: Number('<%= transport ? transport.allocation : 0 %>') },
+            { id: "infrastructure", title: "Infrastructure", icon: "building-2", description: `<%= infrastructure ? infrastructure.description : 'Public parks, water supply, and sanitation.' %>`, budget: Number('<%= infrastructure ? infrastructure.allocation : 0 %>') },
+            { id: "education", title: "Public Education", icon: "graduation-cap", description: `<%= education ? education.description : 'Schools, libraries, and educational materials.' %>`, budget: Number('<%= education ? education.allocation : 0 %>') },
+            { id: "healthcare", title: "Healthcare", icon: "heart-pulse", description: `<%= healthcare ? healthcare.description : 'Public hospitals and community health programs.' %>`, budget: Number('<%= healthcare ? healthcare.allocation : 0 %>') },
+            { id: "subsidies", title: "Subsidies", icon: "receipt", description: `<%= subsidies ? subsidies.description : 'Support for essential goods and food grains.' %>`, budget: Number('<%= subsidies ? subsidies.allocation : 0 %>') },
+            { id: "college_funds", title: "College Grants", icon: "book-marked", description: `<%= college ? college.description : 'Scholarships and university research grants.' %>`, budget: Number('<%= college ? college.allocation : 0 %>') }
+        ];
+
+        // --- CARD RENDERER ---
+        const createCard = (item, index) => {
+            const formatCr = (val) => `₹${(val / 10000000).toFixed(2)} Cr`;
+            return `
+                <div class="bg-white/5 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/5 hover:border-accent/30 transition-all group animate-slide-up" style="animation-delay: ${index * 50}ms">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="p-4 bg-accent/10 rounded-2xl group-hover:scale-110 transition-transform">
+                            <i data-lucide="${item.icon}" class="w-8 h-8 text-accent"></i>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-accent/60 border border-accent/20 px-3 py-1 rounded-full">Official Allocation</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-3">${item.title}</h3>
+                    <p class="text-sm text-secondary/60 leading-relaxed mb-8 h-12 overflow-hidden">${item.description}</p>
+                    <div class="pt-6 border-t border-white/10">
+                        <p class="text-[10px] uppercase tracking-widest text-secondary/40 mb-1">Budget Allowed</p>
+                        <p class="text-3xl font-black text-white tracking-tighter">${formatCr(item.budget)}</p>
+                    </div>
+                </div>`;
+        };
+
+        const render = (data) => {
+            const container = document.getElementById('ledger-cards-container');
+            const noResults = document.getElementById('no-results');
+            
+            if (data.length === 0) {
+                container.innerHTML = '';
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                container.innerHTML = data.map((item, i) => createCard(item, i)).join('');
+            }
+            lucide.createIcons();
+        };
+
+        // --- SEARCH LOGIC ---
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = ledgerData.filter(item => 
+                item.title.toLowerCase().includes(term) || 
+                item.description.toLowerCase().includes(term)
+            );
+            render(filtered);
+        });
+
+        // --- CONSTELLATION BACKGROUND ---
+        const initBg = () => {
+            const canvas = document.getElementById('background-canvas');
+            const ctx = canvas.getContext('2d');
+            let pts = [];
+            const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+            const createPts = () => {
+                pts = [];
+                for(let i=0; i<80; i++) pts.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3 });
+            };
+            const draw = () => {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                pts.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if(p.x<0 || p.x>canvas.width) p.vx*=-1;
+                    if(p.y<0 || p.y>canvas.height) p.vy*=-1;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2); ctx.fillStyle = 'rgba(6,182,212,0.4)'; ctx.fill();
+                });
+                for(let i=0; i<pts.length; i++) {
+                    for(let j=i+1; j<pts.length; j++) {
+                        let dist = Math.hypot(pts[i].x-pts[j].x, pts[i].y-pts[j].y);
+                        if(dist < 150) {
+                            ctx.strokeStyle = `rgba(209,250,229,${(1-dist/150)*0.2})`;
+                            ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y); ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(draw);
+            };
+            window.addEventListener('resize', resize);
+            resize(); createPts(); draw();
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            render(ledgerData);
+            initBg();
+        });
+    </script>
 </body>
 </html>
-

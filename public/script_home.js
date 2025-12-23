@@ -13,15 +13,6 @@
                 },
                 "animations": { "tooltip": "fade-in", "button": "pulse-on-hover", "cardEntry": "slide-up", "alertHighlight": "shake", "graphFlow": "glow-trail", "modal": "scale-in" }
             },
-            "landingPage": {
-                "hero": {
-                    "headline": "Transparency. Trust. Together.",
-                    "subheadline": "Track every rupee from budget to impact with complete clarity.",
-                    "callToActions": [
-                         { "text": "View Infographics", "actionId": "view_infographics" }
-                    ]
-                }
-            },
             "viewContext": {
                 "userProfile": { "name": "<%= username %>", "role": "Public Viewer" },
             }
@@ -128,10 +119,6 @@
                     <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-primary">${hero.headline}</h1>
                     <p class="mt-4 max-w-2xl mx-auto text-lg text-secondary">${hero.subheadline}</p>
                     <div class="mt-8 flex justify-center items-center flex-wrap gap-4">
-                        <a href="#" id="infographics-btn" class="btn-secondary-animated inline-flex items-center gap-2 bg-foreground/50 text-primary font-semibold py-3 px-8 rounded-lg">
-                            <i data-lucide="pie-chart" class="w-5 h-5"></i>
-                            <span>View Infographics</span>
-                        </a>
                         <a href="/public-ledger" class="btn-secondary-animated inline-flex items-center gap-2 bg-foreground/50 text-primary font-semibold py-3 px-8 rounded-lg">
                             <i data-lucide="book-open-check" class="w-5 h-5"></i>
                             <span>Public Ledger</span>
